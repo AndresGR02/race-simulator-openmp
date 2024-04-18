@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <omp.h>
+#include <iomanip>
 
 int speedPowerUp = 100;
 int nerfPowerUp = 50;
@@ -73,7 +74,7 @@ public:
 std::vector<Player> podium;
 std::vector<std::string> finishLine;
 
-void printStartingGrid(std::vector<Player>& players) {
+void printStartingGrid(std::vector<Player>& players, int iteration) {
     std::vector<std::string> track(players.size(), "");
     
     for (size_t i = 0; i < players.size(); ++i) {
@@ -82,11 +83,23 @@ void printStartingGrid(std::vector<Player>& players) {
         track[i] = std::string(position, '-') + players[i].getName() + " " + std::to_string(players[i].getCoveredDistance()) + "m";
     }
 
-    std::cout << "══════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
-    for (const auto& lane : track) {
-        std::cout << "▄▀▄" << lane << std::endl;
+    std::string color = "\e[1;31m";
+    if (iteration == 1) {
+        color = "\e[1;32m";
+    } else if (iteration == 2) {
+        color = "\033[1;33m";
     }
-    std::cout << "══════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
+    
+    
+    std::cout << std::endl;
+    std::cout << color << "                    ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
+    std::cout << color << "                    ║                               F1-Kart                               ║                    " << std::endl;
+    std::cout << color << "                    ╚═════════════════════════════════════════════════════════════════════╝                    " << std::endl;
+    std::cout << color << "╔═╦════════════════════════════════════════════════════════════════════════════════════════════════════════════\e[0m" << std::endl;
+    for (const auto& lane : track) {
+        std::cout <<  color << "▄▀▄-" << lane << "\e[0m" << std::endl;
+    }
+    std::cout <<  color << "╚═╩════════════════════════════════════════════════════════════════════════════════════════════════════════════\e[0m" << std::endl;
 
 }
 
@@ -97,19 +110,18 @@ void printRaceTrack(std::vector<Player>& players) {
         int position = distance / 10; 
         track[i] = std::string(position, '-') + players[i].getName() + " " + std::to_string(players[i].getCoveredDistance()) + "m";
     }
-    
-    std::cout << "══════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
-    for (const auto& lane : track) {
-        std::cout << "▄▀▄" << lane << std::endl;
-    }
-    std::cout << "══════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
 
-    std::cout << "       \e[1;101m******\e[0m       \n" 
-                 "     \e[1;101m***********\e[0m     \n"
-                 "   \e[1;101m************\e[0m     \n" 
-                 "    \e[1;101m*************\e[0m     \n"
-                 "     \e[1;101m**********\e[0m      \n"
-                 "       \e[1;101m******\e[0m        \n";
+    std::cout << std::endl;
+    std::cout << "                    ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
+    std::cout << "                    ║                               F1-Kart                               ║                    " << std::endl;
+    std::cout << "                    ╚═════════════════════════════════════════════════════════════════════╝                    " << std::endl;
+    
+    std::cout << "╔═╦════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
+    for (const auto& lane : track) {
+        std::cout << "▄▀▄-" << lane << std::endl;
+    }
+    std::cout << "╚═╩════════════════════════════════════════════════════════════════════════════════════════════════════════════" << std::endl;
+
 }
 
 std::vector<Player> getPositions(std::vector<Player> players) {
@@ -121,7 +133,7 @@ std::vector<Player> getPositions(std::vector<Player> players) {
 
 int main() {
 
-    static const std::string protagonistNames[] = {
+    std::vector<std::string> protagonistNames = {
         "Alonso", "Link", "Luigi", "Zelda", "Leclerc",
         "Yoshi", "Samus", "Drake", "Kratos", "Pikachu",
         "Goku", "Sonic", "Doomguy", "Ezio",
@@ -130,10 +142,16 @@ int main() {
 
     std::vector<Player> players;
     
-    for (std::string name : protagonistNames) {
-        Player player(name);
-        players.push_back(player);
+    // Add players in random order
+    while(protagonistNames.size() > 0) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dist(0, protagonistNames.size() - 1);
+        int randomIndex = dist(gen);
+        players.push_back(Player(protagonistNames[randomIndex]));
+        protagonistNames.erase(protagonistNames.begin() + randomIndex);
     }
+
 
     #pragma omp parallel num_threads(players.size()) 
     {
@@ -148,8 +166,11 @@ int main() {
 
         #pragma omp single
         {
-            printRaceTrack(players);
-            sleep(3);
+            for (int i = 0; i < 3; i++) {
+                system("clear");
+                printStartingGrid(players, i);
+                sleep(1);
+            }
         }
 
         while(currentPlayer.getCoveredDistance() < totalDistance && !gameOver) 
@@ -202,12 +223,26 @@ int main() {
         }
     }
 
-    int i = 0;
-    for (Player player : getPositions(players)) {
-        std::cout << "Position " << ++i << ": ";
-        std::cout << player.getName() << " " << player.getCoveredDistance() << "m" << std::endl;
+    std::cout << std::endl;
+    std::cout << "                    ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
+    std::cout << "                    ║                             Leaderboard                             ║                    " << std::endl;
+
+    std::vector<Player> sortedPlayers = getPositions(players);
+
+    std::cout << "                    ╠══════════════════════════════════╦══════════════════════════════════╣                    " << std::endl;
+    for(int i = 0; i < sortedPlayers.size()/2; i++) {
+        std::string index;
+        if(i + 1 < 10) {
+            index = "0" + std::to_string(i + 1);
+        } else {
+            index = std::to_string(i + 1);
+        }
+
+        std::cout << "                    ║ Position " + index + ": " << std::left << std::setw(12) << sortedPlayers[i].getName() + " " << std::setw(8) << std::to_string(sortedPlayers[i].getCoveredDistance()) + "m";
+        std::cout << std::left << std::setw(6) << "║";
+        std::cout << "Position " + std::to_string(i + 11) + ": " << std::left << std::setw(12) << sortedPlayers[i + 10].getName() + " " << std::setw(6) << std::to_string(sortedPlayers[i + 10].getCoveredDistance()) + "m" << "║" << std::endl;
     }
 
+    std::cout << "                    ╚══════════════════════════════════╩══════════════════════════════════╝                    " << std::endl;
     return 0;
 }
-
