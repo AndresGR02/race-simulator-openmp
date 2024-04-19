@@ -8,7 +8,11 @@ find_package(OpenMP REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(SOURCES
-    src/main.cpp)
+    src/main.cpp
+    src/interface.cpp
+    src/player.cpp
+    src/simulator.cpp
+    )
 
 # Add executable and link OpenMP
 add_executable(race_simulator ${SOURCES})
