@@ -20,6 +20,8 @@ public:
 
 private:
     int getRandomNumber(int min, int max);
+    void resetGlobalVariables();
+    std::vector<Player> getPositions(std::vector<Player> players);
 };
 
 #endif // SIMULATOR_H

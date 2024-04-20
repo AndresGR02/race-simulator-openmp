@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <algorithm>
+#include <limits>
 
 #include "player.h"
 

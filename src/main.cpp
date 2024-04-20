@@ -3,13 +3,12 @@
 #include  "interface.h"
 
 int main() {
-
-    Simulator simulator;
     Interface interface;
 
     while (true){
         int option = interface.printMenu();
         if (option == 1) {
+            Simulator simulator;
             simulator.simulateRace();
             interface.backToMenu();
         }
