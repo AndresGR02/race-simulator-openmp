@@ -12,6 +12,7 @@ set(SOURCES
     src/interface.cpp
     src/player.cpp
     src/simulator.cpp
+    src/game.cpp
     )
 
 # Add executable and link OpenMP
