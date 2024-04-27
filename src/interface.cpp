@@ -2,33 +2,57 @@
 
 int Interface::printMenu() {
 
-    int choice;
+    int choice = 1;
     while (true) {
-        clearScreen();
-        std::cout << "\n      F1-Kart\n"
-                  << std::endl;
-        std::cout << "1. Simulate race" << std::endl;
-        std::cout << "2. Credits" << std::endl;
-        std::cout << "3. Exit" << std::endl;
-        std::cout << std::endl
-                  << "Enter your choice: ";
-        std::cin >> choice;
-        if (std::cin.fail()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        } else {
-            break;
+        clear(); // Clear the screen
+        printw("\n      F1-Kart\n\n");
+
+        for (int i = 1; i <= 3; ++i) {
+            printw("      ");
+            if (i == choice) {
+                printw(" ");
+                attron(A_REVERSE); // Highlight current option
+            }
+            switch (i) {
+            case 1:
+                printw("Simulate race\n");
+                break;
+            case 2:
+                printw("Credits\n");
+                break;
+            case 3:
+                printw("Exit\n");
+                break;
+            }
+            if (i == choice) {
+                attroff(A_REVERSE); // Turn off highlighting
+            }
         }
+
+        int ch = getch();
+
+        if (ch == 'q' || ch == 'Q') {
+            endwin(); // End ncurses
+            return 3; // Exit the program
+        } else if (ch == KEY_UP || ch == 'w' || ch == 'W') {
+            if (choice == 1) {
+                choice = 3;
+            } else {
+                choice--;
+            }
+        } else if (ch == KEY_DOWN || ch == 's' || ch == 'S') {
+            if (choice == 3) {
+                choice = 1;
+            } else {
+                choice++;
+            }
+        } else if (ch == '\n' && choice >= 1 && choice <= 3) {
+            return choice; // Return the selected option
+        }
+
+        refresh(); // Refresh the screen
     }
     return choice;
-}
-
-void Interface::clearScreen() {
-#if defined(_WIN32)
-    system("cls");
-#elif defined(__linux__)
-    system("clear");
-#endif
 }
 
 std::vector<Player> Interface::getPositions(std::vector<Player> players) {
@@ -41,7 +65,7 @@ std::vector<Player> Interface::getPositions(std::vector<Player> players) {
 void Interface::printStartingGrid(std::vector<Player> &players) {
 
     for (int i = 0; i < 3; i++) {
-        system("clear");
+        clear(); // Clear the screen
         std::vector<std::string> track(players.size(), "");
 
         for (size_t i = 0; i < players.size(); ++i) {
@@ -50,50 +74,42 @@ void Interface::printStartingGrid(std::vector<Player> &players) {
             track[i] = std::string(position, '-') + players[i].getName() + " " + std::to_string(players[i].getCoveredDistance()) + "m";
         }
 
-        std::string color = "\033[31m";
+        int color = 1; // Red
         if (i == 1) {
-            color = "\033[33m";
+            color = 4; // Yellow
         } else if (i == 2) {
-            color = "\033[32m";
+            color = 3; // Green
         }
 
-        std::cout << std::endl;
-        std::cout << color << "                                ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
-        std::cout << color << "                                ║                               F1-Kart                               ║                    " << std::endl;
-        std::cout << color << "                                ╚═════════════════════════════════════════════════════════════════════╝                    " << std::endl;
-        std::cout << color << "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\e[0m" << std::endl;
+        printw("\n");
+        attron(COLOR_PAIR(color));
+        printw("                                ╔═════════════════════════════════════════════════════════════════════╗\n");
+        printw("                                ║                               F1-Kart                               ║\n");
+        printw("                                ╚═════════════════════════════════════════════════════════════════════╝\n");
+        printw("╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
         for (const auto &lane : track) {
-            std::cout << color << "║▄▀▄-" << std::left << std::setw(129) << lane << "║"
-                      << "\e[0m" << std::endl;
+            printw("║▄▀▄-%-129s║\n", lane.c_str());
         }
-        std::cout << color << "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\e[0m" << std::endl;
+        printw("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 
-        std::string bgColor = "\033[41m";
-        if (i == 1) {
-            bgColor = "\033[43m";
-        } else if (i == 2) {
-            bgColor = "\033[42m";
-        }
+        printw("\n");                                                  
+        printw("                                           ███████              ███████              ███████\n");
+        printw("                                         ███████████          ███████████          ███████████\n");
+        printw("                                        █████████████        █████████████        █████████████\n");
+        printw("                                        █████████████        █████████████        █████████████\n");
+        printw("                                         ███████████          ███████████          ███████████\n");
+        printw("                                           ███████              ███████              ███████\n");
+        
+        attroff(COLOR_PAIR(color));
 
-        std::cout << std::endl;
-        std::cout << "                                           " << bgColor << "*******\e[0m              " << bgColor << "*******\e[0m              " << bgColor << "*******\e[0m           \n"
-                                                                                                                                                                       "                                         "
-                  << bgColor << "***********\e[0m          " << bgColor << "***********\e[0m          " << bgColor << "***********\e[0m         \n"
-                                                                                                                      "                                        "
-                  << bgColor << "*************\e[0m        " << bgColor << "*************\e[0m        " << bgColor << "*************\e[0m        \n"
-                                                                                                                      "                                        "
-                  << bgColor << "*************\e[0m        " << bgColor << "*************\e[0m        " << bgColor << "*************\e[0m        \n"
-                                                                                                                      "                                         "
-                  << bgColor << "***********\e[0m          " << bgColor << "***********\e[0m          " << bgColor << "***********\e[0m         \n"
-                                                                                                                      "                                           "
-                  << bgColor << "*******\e[0m              " << bgColor << "*******\e[0m              " << bgColor << "*******\e[0m           \n";
-
+        refresh(); // Refresh the screen
         sleep(1);
     }
 }
 
 void Interface::printRaceTrack(std::vector<Player> &players) {
-    system("clear");
+    clear(); // Clear the screen
+
     std::vector<std::string> track(players.size(), "");
     for (size_t i = 0; i < players.size(); ++i) {
         int distance = players[i].getCoveredDistance();
@@ -101,26 +117,29 @@ void Interface::printRaceTrack(std::vector<Player> &players) {
         track[i] = std::string(position, '-') + players[i].getName() + " " + std::to_string(players[i].getCoveredDistance()) + "m";
     }
 
-    std::cout << std::endl;
-    std::cout << "                                ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
-    std::cout << "                                ║                               F1-Kart                               ║                    " << std::endl;
-    std::cout << "                                ╚═════════════════════════════════════════════════════════════════════╝                    " << std::endl;
+    printw("\n");
+    printw("                                ╔═════════════════════════════════════════════════════════════════════╗\n");
+    printw("                                ║                               F1-Kart                               ║\n");
+    printw("                                ╚═════════════════════════════════════════════════════════════════════╝\n");
 
-    std::cout << "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗" << std::endl;
+    printw("╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
     for (const auto &lane : track) {
-        std::cout << "║▄▀▄-" << std::left << std::setw(129) << lane << "║" << std::endl;
+        printw("║▄▀▄-%-129s║\n", lane.c_str());
     }
-    std::cout << "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝" << std::endl;
+    printw("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
+
+    refresh(); // Refresh the screen
 }
 
 void Interface::printLeaderBoard(std::vector<Player> &players) {
 
     players = getPositions(players);
 
-    std::cout << std::endl;
-    std::cout << "                                ╔═════════════════════════════════════════════════════════════════════╗                    " << std::endl;
-    std::cout << "                                ║                             Leaderboard                             ║                    " << std::endl;
-    std::cout << "                                ╠══════════════════════════════════╦══════════════════════════════════╣                    " << std::endl;
+    printw("\n");
+    printw("                                ╔═════════════════════════════════════════════════════════════════════╗\n");
+    printw("                                ║                             Leaderboard                             ║\n");
+    printw("                                ╠══════════════════════════════════╦══════════════════════════════════╣\n");
+
     for (int i = 0; i < players.size() / 2; i++) {
         std::string index;
         if (i + 1 < 10) {
@@ -129,27 +148,36 @@ void Interface::printLeaderBoard(std::vector<Player> &players) {
             index = std::to_string(i + 1);
         }
 
-        std::cout << "                                ║ Position " + index + ": " << std::left << std::setw(12) << players[i].getName() + " " << std::setw(8) << std::to_string(players[i].getCoveredDistance()) + "m";
-        std::cout << std::left << std::setw(6) << "║";
-        std::cout << "Position " + std::to_string(i + 11) + ": " << std::left << std::setw(12) << players[i + 10].getName() + " " << std::setw(6) << std::to_string(players[i + 10].getCoveredDistance()) + "m"
-                  << "║" << std::endl;
+        // Print first half of the leaderboard
+        std::string coveredDistance1 = std::to_string(players[i].getCoveredDistance()) + "m";
+        std::string playerName1 = players[i].getName();
+
+        printw("                                ║ Position %s: %-12s %-7s", index.c_str(), playerName1.c_str(), coveredDistance1.c_str());
+
+        // Print the separator
+        printw("║%1s", "");
+
+        // Print the second half of the leaderboard
+        std::string coveredDistance2 = std::to_string(players[i + 10].getCoveredDistance()) + "m";
+        std::string playerName2 = players[i + 10].getName();
+        printw("Position %d: %-12s %-7s║\n", i + 11, playerName2.c_str(), coveredDistance2.c_str());
     }
 
-    std::cout << "                                ╚══════════════════════════════════╩══════════════════════════════════╝                    " << std::endl;
+    printw("                                ╚══════════════════════════════════╩══════════════════════════════════╝\n");
+
+    refresh(); // Refresh the screen
 }
 
 void Interface::printCredits() {
-    clearScreen();
-    std::cout << std::endl
-              << "Developed by: " << std::endl
-              << std::endl;
-    std::cout << "  - Luis Fuentes Fuentes" << std::endl;
-    std::cout << "  - Andres Gonzalez Romero" << std::endl;
-    std::cout << "  - Gerick Vargas Camacho " << std::endl;
+    clear();
+    printw("\n Developed by: \n\n");
+    printw("   - Luis Fuentes Fuentes\n");
+    printw("   - Andres Gonzalez Romero\n");
+    printw("   - Gerick Vargas Camacho\n");
 }
 
 void Interface::backToMenu() {
-    std::cout << std::endl
-              << "Press ENTER to go back to the main menu...";
-    std::cin.ignore().get();
+    printw("\n Press ANY KEY to go back to the main menu...");
+    refresh();
+    getch(); // Wait for any key press
 }

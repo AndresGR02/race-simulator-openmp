@@ -15,6 +15,12 @@ set(SOURCES
     src/game.cpp
     )
 
-# Add executable and link OpenMP
+# Create executable from sources
 add_executable(race_simulator ${SOURCES})
-target_link_libraries(race_simulator PRIVATE OpenMP::OpenMP_CXX)
+
+# Link against the ncurses library
+target_link_libraries(race_simulator PRIVATE 
+    OpenMP::OpenMP_CXX 
+    ncursesw
+    )
+
