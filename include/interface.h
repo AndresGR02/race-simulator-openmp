@@ -2,9 +2,7 @@
 #define INTERFACE_H
 
 #include <algorithm>
-#include <iomanip>
 #include <iostream>
-#include <limits>
 #include <ncurses.h>
 #include <unistd.h>
 #include <vector>
@@ -19,6 +17,7 @@ public:
     void printRaceTrack(std::vector<Player> &players);
     void printLeaderBoard(std::vector<Player> &players);
     void printCredits();
+    void displayGoodbye();
     void backToMenu();
 
 private:

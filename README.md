@@ -20,7 +20,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd tic-tac-toe
+  cd  race-simulator-openmp
 ```
 
 Install dependencies

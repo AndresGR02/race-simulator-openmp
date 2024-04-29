@@ -5,12 +5,34 @@ int Interface::printMenu() {
     int choice = 1;
     while (true) {
         clear(); // Clear the screen
-        printw("\n      F1-Kart\n\n");
 
+        attron(A_BOLD); // Bold text
+        printw("\n ________  _____                 ___  __    ________  ________  _________   ");
+        printw("\n|\\  _____\\/ __  \\               |\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\___   ___\\ ");
+        printw("\n\\ \\  \\__/|\\/_|\\  \\  ____________\\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\_| ");
+        printw("\n \\ \\   __\\|/ \\ \\  \\|\\____________\\ \\   ___  \\ \\   __  \\ \\   _  _\\   \\ \\  \\  ");
+        printw("\n  \\ \\  \\_|    \\ \\  \\|____________|\\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\\\  \\|   \\ \\  \\ ");
+        printw("\n   \\ \\__\\      \\ \\__\\              \\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\__\\\\ _\\    \\ \\__\\");
+        printw("\n    \\|__|       \\|__|               \\|__| \\|__|\\|__|\\|__|\\|__|\\|__|    \\|__|\n\n\n");
+        attroff(A_BOLD); // Turn off bold text
+
+        /*
+
+         ________  _____                 ___  __    ________  ________  _________   
+        |\  _____\/ __  \               |\  \|\  \ |\   __  \|\   __  \|\___   ___\ 
+        \ \  \__/|\/_|\  \  ____________\ \  \/  /|\ \  \|\  \ \  \|\  \|___ \  \_| 
+         \ \   __\|/ \ \  \|\____________\ \   ___  \ \   __  \ \   _  _\   \ \  \  
+          \ \  \_|    \ \  \|____________|\ \  \\ \  \ \  \ \  \ \  \\  \|   \ \  \ 
+           \ \__\      \ \__\              \ \__\\ \__\ \__\ \__\ \__\\ _\    \ \__\
+            \|__|       \|__|               \|__| \|__|\|__|\|__|\|__|\|__|    \|__|
+
+        */
+                                                                                    
+                                                                    
         for (int i = 1; i <= 3; ++i) {
             printw("      ");
             if (i == choice) {
-                printw(" ");
+                printw("=> ");
                 attron(A_REVERSE); // Highlight current option
             }
             switch (i) {
@@ -141,18 +163,13 @@ void Interface::printLeaderBoard(std::vector<Player> &players) {
     printw("                                ╠══════════════════════════════════╦══════════════════════════════════╣\n");
 
     for (int i = 0; i < players.size() / 2; i++) {
-        std::string index;
-        if (i + 1 < 10) {
-            index = " " + std::to_string(i + 1);
-        } else {
-            index = std::to_string(i + 1);
-        }
 
         // Print first half of the leaderboard
         std::string coveredDistance1 = std::to_string(players[i].getCoveredDistance()) + "m";
         std::string playerName1 = players[i].getName();
+        int pos1 = i + 1;
 
-        printw("                                ║ Position %s: %-12s %-7s", index.c_str(), playerName1.c_str(), coveredDistance1.c_str());
+        printw("                                ║ Position %2d: %-12s %-7s", pos1, playerName1.c_str(), coveredDistance1.c_str());
 
         // Print the separator
         printw("║%1s", "");
@@ -160,7 +177,8 @@ void Interface::printLeaderBoard(std::vector<Player> &players) {
         // Print the second half of the leaderboard
         std::string coveredDistance2 = std::to_string(players[i + 10].getCoveredDistance()) + "m";
         std::string playerName2 = players[i + 10].getName();
-        printw("Position %d: %-12s %-7s║\n", i + 11, playerName2.c_str(), coveredDistance2.c_str());
+        int pos2 = i + 11;
+        printw("Position %2d: %-12s %-7s║\n", pos2, playerName2.c_str(), coveredDistance2.c_str());
     }
 
     printw("                                ╚══════════════════════════════════╩══════════════════════════════════╝\n");
@@ -174,6 +192,11 @@ void Interface::printCredits() {
     printw("   - Luis Fuentes Fuentes\n");
     printw("   - Andres Gonzalez Romero\n");
     printw("   - Gerick Vargas Camacho\n");
+}
+
+void Interface::displayGoodbye() {
+    clear();
+    printw("\n    Goodbye, thank you for using the simulator!");
 }
 
 void Interface::backToMenu() {
