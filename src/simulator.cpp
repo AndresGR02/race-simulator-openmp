@@ -50,6 +50,7 @@ void Simulator::simulateRace() {
     Interface interface;
     std::vector<Player> players = this->createPlayers();
 
+    //Here n number of threads will be created and run the main logic
     #pragma omp parallel num_threads(players.size())
     {
         int num_threads = omp_get_num_threads();
@@ -58,17 +59,21 @@ void Simulator::simulateRace() {
         int player_index = thread_id;
 
         Player &currentPlayer = players[player_index];
-
+        
+        //This will make the program print the starting grid 1 time only
         #pragma omp single
         {
             interface.printStartingGrid(players);
         }
 
+        //While the game hasn't finished and there's still some distance left to get to the finish line
         while (currentPlayer.getCoveredDistance() < totalDistance && !gameOver) {
             int randomNumber = this->getRandomNumber(1, 100);
 
+            //This will be the power up section 
+            //If a player gets here some extra random distance will be added  
             if (currentPlayer.getCoveredDistance() > 500 && currentPlayer.getPowerUps() == 0) {
-            #pragma omp critical
+            #pragma omp critical //Critical section (only 1 thread at a time will enter this section)
                 {
                     currentPlayer.setPowerUps(1);
                     randomNumber = randomNumber + (0.20 * speedPowerUp);
@@ -76,6 +81,8 @@ void Simulator::simulateRace() {
                 }
             }
 
+            //Nerf section
+            //Will only be applied to the first player to get to 750m distance first 
             #pragma omp critical
             {
                 if (currentPlayer.getCoveredDistance() > 750 && currentPlayer.getTotalNerfs() == 0 && nerfPowerUp > 0) {
@@ -92,11 +99,9 @@ void Simulator::simulateRace() {
             currentPlayer.setSpeed(randomNumber);
             currentPlayer.addCoveredDistance(currentPlayer.getSpeed());
 
+            //Only the main thread will print the race track
             #pragma omp master
             {
-                // std::vector<Player> sortedPlayers = this->getPositions(players);
-                // interface.printRaceTrack(sortedPlayers);
-
                 interface.printRaceTrack(players);
             }
 
